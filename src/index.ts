@@ -17,3 +17,4 @@ try {
     chalk.red(`Error connecting to the database ${(error as Error).message}`)
   );
 }
+
