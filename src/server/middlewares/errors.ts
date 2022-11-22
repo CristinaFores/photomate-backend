@@ -1,15 +1,8 @@
 import "../../loadEnviroment.js";
 import type { NextFunction, Request, Response } from "express";
 import CustomError from "../../CustomError/CustomError.js";
+import { httpStatusCodes } from "../../database/utils/statusCodes.js";
 
-export const httpStatusCodes = {
-  clientErrors: {
-    notFoundError: 404,
-  },
-  serverError: {
-    errorGeneral: 500,
-  },
-};
 const {
   clientErrors: { notFoundError },
   serverError: { errorGeneral },
