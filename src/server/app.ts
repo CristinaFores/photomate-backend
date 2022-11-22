@@ -2,7 +2,7 @@ import "../loadEnviroment.js";
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
-import { generalError, unknownEndpoint } from "./middelwares/errors.js";
+import { generalError, unknownEndpoint } from "./middlewares/errors.js";
 
 const app = express();
 
@@ -15,5 +15,5 @@ app.use(express.json());
 
 app.use(unknownEndpoint);
 app.use(generalError);
-app.use(generalError);
+
 export default app;
