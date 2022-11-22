@@ -1,6 +1,7 @@
 import type { Response, Request, NextFunction } from "express";
 import CustomError from "../../CustomError/CustomError";
-import { generalError, httpStatusCodes, unknownEndpoint } from "./errors";
+import { httpStatusCodes } from "../../database/utils/statusCodes";
+import { generalError, unknownEndpoint } from "./errors";
 
 const {
   clientErrors: { notFoundError },
