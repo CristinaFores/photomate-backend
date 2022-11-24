@@ -8,6 +8,8 @@ module.exports = {
     "src/**/*.ts",
     "!src/index.ts",
     "!src/loadEnvironments.ts",
+    "!src/database/index.ts",
+    "!src/server/startServer.ts",
   ],
   resolver: "jest-ts-webcompat-resolver",
 };
