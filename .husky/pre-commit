@@ -8,7 +8,7 @@ no_color='\033[0m'
 
 echo -e "\n${yellow}Executing pre-commit hook...${no_color}\n"
 
-FILES_PATTERN='\.(js|ts)(\..+)?$'
+FILES_PATTERN='\.(jsx?|tsx?)(\..+)?$'
 FORBIDDEN='console\.[clear|dir|log|info|warn|error]'
 
 #check for console. references in your code
@@ -36,6 +36,5 @@ then
 fi
 
 echo -e "${green}No console. or debugger references found!${no_color}\n"
-echo -e "${green}Git pre-commit hook was successful!${no_color}\n"
-exit 0;
-
+exec npx lint-staged
+exec >/dev/tty2>$1
