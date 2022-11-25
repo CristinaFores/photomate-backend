@@ -1,10 +1,9 @@
-import "../../loadEnviroment.js";
+import environment from "../../loadEnviroment.js";
 import type { NextFunction, Request, Response } from "express";
 import CustomError from "../../CustomError/CustomError.js";
 import User from "../../database/models/User.js";
 import type { RegisterData } from "../../types/types.js";
 import bcrypt from "bcrypt";
-import environment from "../../loadEnviroment.js";
 import jwt from "jsonwebtoken";
 
 export const registerUser = async (
