@@ -1,12 +1,12 @@
-import "../../loadEnviroment";
+import "../../../loadEnviroment";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import request from "supertest";
-import User from "../../database/models/User.js";
-import { connectDb } from "../../database";
-import app from "../app";
+import User from "../../../database/models/User.js";
+import { connectDb } from "../../../database";
+import app from "../../app";
 import bcrypt from "bcrypt";
-import type { RegisterData } from "../../types/types";
+import type { RegisterData } from "../../../types/types";
 
 let server: MongoMemoryServer;
 
