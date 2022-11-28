@@ -86,7 +86,7 @@ describe("Given POST/ login enpoint", () => {
     });
   });
 
-  describe("When it recieves a requestthe username: 'Cristina' , password'0123456789',  email: 'cris@email.com'", () => {
+  describe("When it recieves a request the username: 'Cristina' , password'0123456789',  email: 'cris@email.com'", () => {
     test("Then it should respond with a response status 401, and the message 'Wrong credentials'", async () => {
       const expectedStatus = 401;
 
@@ -96,6 +96,17 @@ describe("Given POST/ login enpoint", () => {
         .expect(expectedStatus);
 
       expect(response.body).toHaveProperty("error", "Wrong credentials");
+    });
+  });
+
+  describe("When it receives a request with origin no valid", () => {
+    test("Then it should response with an error status 500, ", async () => {
+      const response = await request(app)
+        .get("/users/login")
+        .set("Origin", "http://cris.com")
+        .expect(500);
+
+      expect(response.body).toHaveProperty("error");
     });
   });
 });
