@@ -30,7 +30,7 @@ export const getPostById = async (
 ) => {
   const { postId } = req.params;
   try {
-    const posts = await Post.findById(postId);
+    const posts = await Post.findById({ postId });
 
     if (!posts) {
       next(new CustomError("Post not found", 404, "Post not found"));
