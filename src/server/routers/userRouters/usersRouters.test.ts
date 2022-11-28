@@ -2,10 +2,10 @@ import "../../../loadEnviroment";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import request from "supertest";
-import User from "../../../database/models/User.js";
-import { connectDb } from "../../../database";
-import app from "../../app";
 import bcrypt from "bcrypt";
+import { connectDb } from "../../../database";
+import User from "../../../database/models/User";
+import app from "../../app";
 import type { RegisterData } from "../../../types/types";
 
 let server: MongoMemoryServer;
@@ -103,6 +103,17 @@ describe("Given POST/ login enpoint", () => {
     test("Then it should response with an error status 500, ", async () => {
       const response = await request(app)
         .get("/users/login")
+        .set("Origin", "http://cris.com")
+        .expect(500);
+
+      expect(response.body).toHaveProperty("error");
+    });
+  });
+
+  describe("When it receives a request with origin no valid", () => {
+    test("Then it should response with an error status 500, ", async () => {
+      const response = await request(app)
+        .get("/users/posts")
         .set("Origin", "http://cris.com")
         .expect(500);
 
