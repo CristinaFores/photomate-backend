@@ -1,7 +1,7 @@
 import type { NextFunction, Response, Request } from "express";
-import CustomError from "../../CustomError/CustomError.js";
-import User from "../../database/models/User.js";
-import type { Credentials } from "../../types/types";
+import CustomError from "../../../CustomError/CustomError.js";
+import User from "../../../database/models/User.js";
+import type { Credentials } from "../../../types/types";
 import { loginUser, registerUser } from "./usersControllers.js";
 import bcrypt from "bcrypt";
 
