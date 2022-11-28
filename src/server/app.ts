@@ -8,9 +8,8 @@ import corsOptions from "./cors/corsOptions.js";
 
 const app = express();
 
-app.use(cors(corsOptions));
-
 app.disable("x-powered-by");
+app.use(cors(corsOptions));
 
 app.use(morgan("dev"));
 app.use(express.json());
