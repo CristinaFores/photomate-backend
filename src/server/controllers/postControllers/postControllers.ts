@@ -28,13 +28,13 @@ export const getPostById = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { postId } = req.params;
+  const { id } = req.params;
+
   try {
-    const posts = await Post.findById({ postId });
+    const posts = await Post.findById(id);
 
     if (!posts) {
       next(new CustomError("Post not found", 404, "Post not found"));
-
       return;
     }
 
