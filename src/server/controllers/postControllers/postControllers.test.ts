@@ -122,11 +122,9 @@ describe("Given a getPostById controller", () => {
 
   describe("When it receives a request with id no exist", () => {
     test("Then it should call the next", async () => {
-      const req: Partial<CustomRequest> = {
-        params: { postId: "" },
-      };
+      const error = new Error();
 
-      Post.findById = jest.fn().mockRejectedValue(new Error(""));
+      Post.findById = jest.fn().mockRejectedValue(error);
 
       await getPostById(
         req as CustomRequest,
