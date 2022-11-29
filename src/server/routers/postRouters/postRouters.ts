@@ -6,7 +6,7 @@ import {
 
 const postsRouters = express.Router();
 
-postsRouters.get("/posts", getPosts);
-postsRouters.get("/posts/:id", getPostById);
+postsRouters.get("/", getPosts);
+postsRouters.get("/:id", getPostById);
 
 export default postsRouters;

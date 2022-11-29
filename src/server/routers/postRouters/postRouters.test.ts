@@ -9,14 +9,17 @@ import { connectDb } from "../../../database";
 import Post from "../../../database/models/Post";
 import type { Credentials } from "../../../types/types";
 
+let server: MongoMemoryServer;
+
+const userId = "6384fe9a96794a4b19432655";
 const user: Credentials = {
   username: "Cristina",
   password: "123456789",
 };
-let server: MongoMemoryServer;
 
 const requestUserToken = jwt.sign(
-  { user: user.username },
+  { user: user.username, id: userId },
+
   environment.jwtSecret
 );
 
@@ -27,7 +30,8 @@ const postlist = [
     imagePaths: [""],
     buckpicture: [""],
     tags: [""],
-    id: "6384fe9a96794a4b19432655",
+    _id: userId,
+    owner: userId,
   },
 ];
 
@@ -38,11 +42,8 @@ beforeAll(async () => {
   await Post.create(postlist);
 });
 
-beforeEach(async () => {
-  await Post.deleteMany();
-});
-
 afterAll(async () => {
+  await Post.deleteMany();
   await mongoose.disconnect();
   await server.stop();
 });
@@ -53,7 +54,7 @@ describe("Given a POST/ posts enpoint", () => {
       const expectedStatus = 200;
 
       const response = await request(app)
-        .get("/post/posts")
+        .get("/posts")
         .set("Authorization", `Bearer ${requestUserToken}`)
         .set("Content-Type", "application/json")
         .expect(expectedStatus);
@@ -65,23 +66,21 @@ describe("Given a POST/ posts enpoint", () => {
 
 describe("Given a POST/ posts/:id enpoint", () => {
   describe("When it receives a request with one post by id user  ", () => {
-    test("Then it should respond with a 200 status and post destil", async () => {
-      const postlist = [
-        {
-          title: "12345678",
-          description: "esto es mi primer post",
-          imagePaths: [""],
-          buckpicture: [""],
-          tags: [""],
-          id: "6384fe9a96794a4b19432655",
-        },
-      ];
-
-      await Post.create(postlist);
-      const expectedStatus = 400;
-      const [{ id }] = postlist;
+    test("Then it should respond with a 200 status and post list", async () => {
+      const expectedStatus = 200;
       await request(app)
-        .get(`/post/posts/${id}`)
+        .get(`/posts/${userId}`)
+        .set("Authorization", `Bearer ${requestUserToken}`)
+        .set("Content-Type", "application/json")
+        .expect(expectedStatus);
+    });
+  });
+  describe("When it receives a request with one post by id user  ", () => {
+    test("Then it should respond with a 404 status", async () => {
+      const expectedStatus = 404;
+
+      await request(app)
+        .get(`/posts/6384fe9a96794a4b19432651`)
         .set("Authorization", `Bearer ${requestUserToken}`)
         .set("Content-Type", "application/json")
         .expect(expectedStatus);
@@ -90,23 +89,11 @@ describe("Given a POST/ posts/:id enpoint", () => {
 
   describe("Given a POST/ posts/:id enpoint", () => {
     describe("When it receives a request with one post by id user  ", () => {
-      test("Then it should respond with a 200 status and post destil", async () => {
-        const postlist = [
-          {
-            title: "12345678",
-            description: "esto es mi primer post",
-            imagePaths: [""],
-            buckpicture: [""],
-            tags: [""],
-            id: "6384fe9a96794a4b19432655",
-          },
-        ];
-
-        await Post.create(postlist);
+      test("Then it should respond with a 401 status and post destil", async () => {
         const expectedStatus = 401;
-        const [{ id }] = postlist;
+        const [{ _id }] = postlist;
         await request(app)
-          .get(`/post/posts/${id}`)
+          .get(`/posts/${_id}`)
           .set("Authorization", `Bearer ${""}`)
           .set("Content-Type", "application/json")
           .expect(expectedStatus);
