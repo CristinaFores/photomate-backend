@@ -10,7 +10,7 @@ export const getPosts = async (
 ) => {
   const { userId } = req;
   try {
-    const posts = await Post.find({ userPosts: userId });
+    const posts = await Post.find({ owner: userId });
     res.status(200).json({ posts });
   } catch (error: unknown) {
     next(
