@@ -1,6 +1,6 @@
 import type { JwtPayload } from "jsonwebtoken";
 import type { Request } from "express";
-import type { PostStructure } from "../database/models/Post";
+import type { PostStructure } from "../database/models/Post.js";
 export interface Credentials {
   username: string;
   password: string;
