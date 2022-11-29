@@ -23,7 +23,6 @@ const postSchema = new Schema({
       ref: "User",
     },
   ],
-
   imagePaths: [
     {
       type: String,
@@ -39,9 +38,10 @@ const postSchema = new Schema({
       type: String,
     },
   ],
-  userPosts: {
+  owner: {
     type: Schema.Types.ObjectId,
     ref: "User",
+    require,
   },
   date: {
     type: Date,
