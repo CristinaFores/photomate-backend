@@ -16,7 +16,7 @@ app.use(cors(corsOptions));
 app.use(morgan("dev"));
 app.use(express.json());
 app.use("/users", userRouters);
-app.use("/post", auth, postsRouters);
+app.use("/posts", auth, postsRouters);
 app.use(unknownEndpoint);
 app.use(generalError);
 
