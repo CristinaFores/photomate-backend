@@ -1,13 +1,24 @@
 import "../../../loadEnviroment";
+import environment from "../../../loadEnviroment";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import request from "supertest";
-
+import jwt from "jsonwebtoken";
 import app from "../../app";
 import { connectDb } from "../../../database";
 import Post from "../../../database/models/Post";
+import type { Credentials } from "../../../types/types";
 
+const user: Credentials = {
+  username: "Cristina",
+  password: "123456789",
+};
 let server: MongoMemoryServer;
+
+const requestUserToken = jwt.sign(
+  { user: user.username },
+  environment.jwtSecret
+);
 
 const postlist = [
   {
@@ -42,7 +53,9 @@ describe("Given a POST/ posts enpoint", () => {
       const expectedStatus = 200;
 
       const response = await request(app)
-        .get("/users/posts")
+        .get("/post/posts")
+        .set("Authorization", `Bearer ${requestUserToken}`)
+        .set("Content-Type", "application/json")
         .expect(expectedStatus);
 
       expect(response.body).toHaveProperty("posts");
@@ -67,7 +80,37 @@ describe("Given a POST/ posts/:id enpoint", () => {
       await Post.create(postlist);
       const expectedStatus = 400;
       const [{ id }] = postlist;
-      await request(app).get(`/users/posts/${id}`).expect(expectedStatus);
+      await request(app)
+        .get(`/post/posts/${id}`)
+        .set("Authorization", `Bearer ${requestUserToken}`)
+        .set("Content-Type", "application/json")
+        .expect(expectedStatus);
+    });
+  });
+
+  describe("Given a POST/ posts/:id enpoint", () => {
+    describe("When it receives a request with one post by id user  ", () => {
+      test("Then it should respond with a 200 status and post destil", async () => {
+        const postlist = [
+          {
+            title: "12345678",
+            description: "esto es mi primer post",
+            imagePaths: [""],
+            buckpicture: [""],
+            tags: [""],
+            id: "6384fe9a96794a4b19432655",
+          },
+        ];
+
+        await Post.create(postlist);
+        const expectedStatus = 401;
+        const [{ id }] = postlist;
+        await request(app)
+          .get(`/post/posts/${id}`)
+          .set("Authorization", `Bearer ${""}`)
+          .set("Content-Type", "application/json")
+          .expect(expectedStatus);
+      });
     });
   });
 });

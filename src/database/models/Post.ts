@@ -41,7 +41,6 @@ const postSchema = new Schema({
   owner: {
     type: Schema.Types.ObjectId,
     ref: "User",
-    require,
   },
   date: {
     type: Date,
