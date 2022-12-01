@@ -8,9 +8,9 @@ export const getPosts = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { userId } = req;
   try {
-    const posts = await Post.find({ owner: userId });
+    const posts = await Post.find({}).populate("owner");
+
     res.status(200).json({ posts });
   } catch (error: unknown) {
     next(
@@ -41,5 +41,29 @@ export const getPostById = async (
     res.status(200).json(posts);
   } catch (error: unknown) {
     next(new CustomError((error as Error).message, 400, "Post not found"));
+  }
+};
+
+export const deletePostById = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const { userId } = req;
+  const { id } = req.params;
+
+  try {
+    const post = await Post.findOne({ _id: id });
+
+    if (post.owner.toString() !== userId) {
+      next(new CustomError("Not allowed", 404, " Delete not allowed"));
+      return;
+    }
+
+    await post.delete();
+
+    res.status(200).json({ message: "Post Deleted successfully" });
+  } catch (error: unknown) {
+    next(new CustomError((error as Error).message, 400, "Post not found no"));
   }
 };
