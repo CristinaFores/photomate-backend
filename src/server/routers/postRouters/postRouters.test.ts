@@ -38,17 +38,22 @@ const postlist = [
 beforeAll(async () => {
   server = await MongoMemoryServer.create();
   await connectDb(server.getUri());
-
-  await Post.create(postlist);
 });
 
 afterAll(async () => {
-  await Post.deleteMany();
-  await mongoose.disconnect();
+  await mongoose.connection.close();
   await server.stop();
 });
 
+afterEach(async () => {
+  await Post.deleteMany();
+});
+
 describe("Given a POST/ posts enpoint", () => {
+  beforeEach(async () => {
+    await Post.create(postlist);
+  });
+
   describe("When it receives a request with list the posts", () => {
     test("Then it should respond with a 200 status and a list post", async () => {
       const expectedStatus = 200;
@@ -65,6 +70,9 @@ describe("Given a POST/ posts enpoint", () => {
 });
 
 describe("Given a POST/ posts/:id enpoint", () => {
+  beforeEach(async () => {
+    await Post.create(postlist);
+  });
   describe("When it receives a request with one post by id user  ", () => {
     test("Then it should respond with a 200 status and post list", async () => {
       const expectedStatus = 200;
@@ -98,6 +106,45 @@ describe("Given a POST/ posts/:id enpoint", () => {
           .set("Content-Type", "application/json")
           .expect(expectedStatus);
       });
+    });
+  });
+});
+
+describe("Given a DELETE /:id endpoint", () => {
+  describe("When it receives a request with one post by id and it existe", () => {
+    test("Then it should respond with status 200 ", async () => {
+      const postlist = [
+        {
+          title: "new post",
+          description: "description",
+          imagePaths: ["../../../img/algo-salio-mal.png"],
+          buckpicture: ["../../../img/algo-salio-mal.png"],
+          date: "2022-12-01T15:10:24.551Z",
+          _id: userId,
+          owner: userId,
+        },
+      ];
+      const [{ _id }] = postlist;
+      await Post.create(postlist);
+
+      const response = await request(app)
+        .delete(`/posts/${_id}`)
+        .set("Authorization", `Bearer ${requestUserToken}`)
+        .send({ id: "6388c3e008d4c054bd2e59eb" })
+        .expect(200);
+
+      expect(response.body);
+    });
+  });
+
+  describe("When it receives an authorized request with an invalid id", () => {
+    test("Then it should respond with status 403 '", async () => {
+      const response = await request(app)
+        .delete(`/posts/12345`)
+        .set("Authorization", `Bearer ${requestUserToken}`)
+        .expect(400);
+
+      expect(response.body);
     });
   });
 });
