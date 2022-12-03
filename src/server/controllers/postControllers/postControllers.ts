@@ -1,5 +1,6 @@
 import type { NextFunction, Response } from "express";
 import CustomError from "../../../CustomError/CustomError.js";
+import type { PostStructure } from "../../../database/models/Post.js";
 import Post from "../../../database/models/Post.js";
 import type { CustomRequest } from "../../../types/types.js";
 
@@ -65,5 +66,39 @@ export const deletePostById = async (
     res.status(200).json({ message: "Post Deleted successfully" });
   } catch (error: unknown) {
     next(new CustomError((error as Error).message, 400, "Post not found no"));
+  }
+};
+
+export const createPost = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const { userId } = req;
+  const { title, buckpicture, imagePaths, owner, description } =
+    req.body as PostStructure;
+
+  try {
+    const post = {
+      createdBy: userId,
+      title,
+      description,
+      buckpicture,
+      imagePaths,
+      owner,
+    };
+
+    const newPost = await (await Post.create(post)).populate("owner");
+
+    res.status(200).json(newPost);
+
+    res.status(201).json({ text: "Character created!" });
+  } catch (error: unknown) {
+    const customError = new CustomError(
+      (error as Error).message,
+      400,
+      "Error creating the prediction"
+    );
+    next(customError);
   }
 };
