@@ -2,7 +2,12 @@ import type { NextFunction, Response } from "express";
 import CustomError from "../../../CustomError/CustomError";
 import Post from "../../../database/models/Post";
 import type { CustomRequest } from "../../../types/types";
-import { deletePostById, getPostById, getPosts } from "./postControllers";
+import {
+  createPost,
+  deletePostById,
+  getPostById,
+  getPosts,
+} from "./postControllers";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -195,6 +200,55 @@ describe("Given a deletePostById controller", () => {
       });
       await deletePostById(req as CustomRequest, res as Response, next);
       expect(next).toHaveBeenCalledWith(error);
+    });
+  });
+});
+
+describe("Given a controller createPost", () => {
+  const post = {
+    title: "12345678",
+    description: "esto es mi primer post",
+    likes: [""],
+    imagePaths: [""],
+    buckpicture: [""],
+    tags: [""],
+    id: "6384fe9a96794a4b19432655",
+  };
+  const req: Partial<CustomRequest> = {
+    body: post,
+    userId: "1234",
+    params: {
+      id: "1234",
+    },
+  };
+  describe("When it receives a request create post with title,description,image", () => {
+    test("Then it should the response method status with a 201 ", async () => {
+      const newPost = { ...post };
+      const expexStatus = 201;
+      Post.find = jest.fn().mockReturnValue([]);
+      Post.create = jest.fn().mockReturnValue(newPost);
+
+      await createPost(
+        req as CustomRequest,
+        res as Response,
+        next as NextFunction
+      );
+
+      expect(res.status).toHaveBeenCalledWith(expexStatus);
+    });
+  });
+
+  describe("When it receives a request create post with  error", () => {
+    test("Then it should call next ", async () => {
+      Post.find = jest.fn().mockResolvedValue([]);
+
+      await createPost(
+        req as CustomRequest,
+        res as Response,
+        next as NextFunction
+      );
+
+      expect(next).toHaveBeenCalled();
     });
   });
 });
