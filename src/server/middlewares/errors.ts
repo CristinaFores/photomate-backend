@@ -2,6 +2,7 @@ import "../../loadEnviroment.js";
 import type { NextFunction, Request, Response } from "express";
 import CustomError from "../../CustomError/CustomError.js";
 import { httpStatusCodes } from "../../database/utils/statusCodes.js";
+import { ValidationError } from "express-validation";
 
 const {
   clientErrors: { notFoundError },
@@ -25,12 +26,16 @@ export const unknownEndpoint = (
 };
 
 export const generalError = (
-  error: CustomError,
+  error: CustomError | ValidationError,
   req: Request,
   res: Response,
   // eslint-disable-next-line no-unused-vars
   next: NextFunction
 ) => {
+  if (error instanceof ValidationError) {
+    return res.status(400).json(error);
+  }
+
   const statusCode = error.statusCode ?? errorGeneral;
   const publicMessage = error.publicMessage || "There is a error general";
 

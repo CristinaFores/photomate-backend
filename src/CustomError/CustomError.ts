@@ -1,3 +1,8 @@
+import debugCreator from "debug";
+import chalk from "chalk";
+
+const debug = debugCreator("custom-error");
+
 class CustomError extends Error {
   constructor(
     message: string,
@@ -5,6 +10,7 @@ class CustomError extends Error {
     public publicMessage: string
   ) {
     super(message);
+    debug(chalk.red(message));
   }
 }
 export default CustomError;

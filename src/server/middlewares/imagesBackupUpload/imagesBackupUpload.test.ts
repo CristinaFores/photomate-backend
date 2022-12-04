@@ -4,10 +4,9 @@ import fs from "fs/promises";
 import CustomError from "../../../CustomError/CustomError";
 
 import type { CustomRequest } from "../../../types/types";
-import postRoutes from "../../routers/routes/postRouters";
 import imageBackupUpload, { bucket } from "./imagesBackupUpload";
 
-const { imagesRoute } = postRoutes;
+const imagesRoute = process.env.IMAGES_ROUTE || "assets/images";
 
 const newPost = {
   title: "12345678",

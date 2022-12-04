@@ -40,7 +40,7 @@ export const getPostById = async (
 
     res.status(200).json(posts);
   } catch (error: unknown) {
-    next(new CustomError((error as Error).message, 400, "Post not found"));
+    next(new CustomError((error as Error).message, 400, "Invalid Id"));
   }
 };
 
@@ -56,7 +56,7 @@ export const deletePostById = async (
     const post = await Post.findOne({ _id: id });
 
     if (post.owner.toString() !== userId) {
-      next(new CustomError("Not allowed", 404, " Delete not allowed"));
+      next(new CustomError("Not allowed", 403, " Delete not allowed"));
       return;
     }
 
@@ -84,11 +84,14 @@ export const createPost = async (
       buckpicture,
       imagePaths,
       owner: userId,
+      date: new Date(),
     };
 
     const newPost = await Post.create(post);
 
-    res.status(201).json({ ...newPost.toJSON(), image: post.imagePaths });
+    return res
+      .status(201)
+      .json({ ...newPost.toJSON(), image: post.imagePaths });
   } catch (error: unknown) {
     next(
       new CustomError((error as Error).message, 400, "Error creating the post")

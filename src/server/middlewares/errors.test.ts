@@ -1,4 +1,5 @@
 import type { Response, Request, NextFunction } from "express";
+import { ValidationError } from "express-validation";
 import CustomError from "../../CustomError/CustomError";
 import { httpStatusCodes } from "../../database/utils/statusCodes";
 import { generalError, unknownEndpoint } from "./errors";
@@ -41,10 +42,10 @@ describe("Given an errors middleware", () => {
   });
 });
 
-describe("Given errors middelware", () => {
+describe("Given errors middleware", () => {
   describe("And the function generalError", () => {
     describe("When it receives an Error with message 'Something went wrong', no status code and no public message", () => {
-      test("Then it should invoke metohd staus code 500 with message 'There is a error general ", () => {
+      test("Then it should invoke method status code 500 with message 'There is a error general ", () => {
         const errorMessage = "There is a error general";
         const errorStatusCode = errorGeneral;
         const error = new Error("Something went wrong");
@@ -56,17 +57,13 @@ describe("Given errors middelware", () => {
       });
     });
 
-    describe("when it recieves an CustomError with message intern, status code 404, and message public 'Theres is a error general", () => {
-      test("Then it should invoke metohd statsus code 404, with message 'There is a error general' ", () => {
-        const errorStatusCode = errorGeneral;
-
-        const customError = new CustomError(
-          "Something went wrong",
-          errorStatusCode,
-          "There is a error gener"
-        );
-
+    describe("When it receives a validation error", () => {
+      test("Then returns the parsed error message ", () => {
+        const customError = new ValidationError({}, {});
         generalError(customError, null, res as Response, null);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith(customError);
       });
     });
   });
