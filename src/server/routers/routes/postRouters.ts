@@ -1,9 +1,9 @@
-const postsRoutes = {
+const postRoutes = {
   postsRoute: "/",
   deletepostRoute: "/:id",
   postIdRoute: "/:id",
-  createPostRoute: "/create",
+  createPostRoute: "/post",
   imagesRoute: "assets/images",
 };
 
-export default postsRoutes;
+export default postRoutes;
