@@ -3,7 +3,7 @@ import path from "path";
 import sharp from "sharp";
 import CustomError from "../../../CustomError/CustomError.js";
 import type { CustomRequest } from "../../../types/types.js";
-import postsRoutes from "../../routers/routes/postsRouters.js";
+import postsRoutes from "../../routers/routes/postRouters.js";
 
 const { imagesRoute } = postsRoutes;
 

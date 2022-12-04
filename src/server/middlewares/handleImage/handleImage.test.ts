@@ -2,11 +2,11 @@ import type { NextFunction } from "express";
 import fs from "fs/promises";
 import CustomError from "../../../CustomError/CustomError";
 import type { CustomRequest } from "../../../types/types";
-import postsRoutes from "../../routers/routes/postsRouters";
+import postRoutes from "../../routers/routes/postRouters";
 
 import handleImage from "./handleImage";
 
-const { imagesRoute } = postsRoutes;
+const { imagesRoute } = postRoutes;
 
 const postlist = [
   {
