@@ -30,9 +30,9 @@ const expectUser = {
   email: "cris@email.com",
 };
 
-describe("Given a POST/ register enpoint", () => {
-  describe("When it's receives a request with the username:'Cristina' , password'0123456789',  email: 'cris@email.com' ", () => {
-    test("Then its should response status code 201 and the user", async () => {
+describe("Given a POST/ register endpoint", () => {
+  describe("When I send a valid body", () => {
+    test("Then it responds with status code 201 and the user", async () => {
       const expectSatus = 201;
 
       const response = await request(app)
@@ -43,9 +43,9 @@ describe("Given a POST/ register enpoint", () => {
     });
   });
 
-  describe("When it receives a request with the username: 'Cristina' , password'0123456789',  email: 'cris@email.com' ", () => {
-    test("Then it should respond with a response status 500, and the message 'Something went wrong'", async () => {
-      const expectedStatus = 500;
+  describe("When I send an email that already exists' ", () => {
+    test("Then it returns a 400 status error", async () => {
+      const expectedStatus = 400;
 
       await User.create(expectUser);
 
@@ -54,12 +54,12 @@ describe("Given a POST/ register enpoint", () => {
         .send(expectUser)
         .expect(expectedStatus);
 
-      expect(response.body).toHaveProperty("error", "Something went wrong");
+      expect(response.body.error).toBe("Email already exists");
     });
   });
 });
 
-describe("Given POST/ login enpoint", () => {
+describe("Given POST/ login endpoint", () => {
   const registerctUser: RegisterData = {
     username: "Cristina",
     password: "123456789",
