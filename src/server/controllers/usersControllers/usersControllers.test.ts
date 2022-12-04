@@ -30,6 +30,7 @@ describe("Given a register controller", () => {
         body: register,
       };
 
+      User.findOne = jest.fn().mockResolvedValueOnce(register);
       User.create = jest.fn().mockResolvedValueOnce(register);
 
       await registerUser(req as Request, res as Response, next as NextFunction);
@@ -47,6 +48,7 @@ describe("Given a register controller", () => {
         const req: Partial<Request> = {
           body: register,
         };
+        User.findOne = jest.fn().mockResolvedValueOnce(register);
         User.create = jest.fn().mockRejectedValue(registerIncorrect);
 
         await registerUser(
