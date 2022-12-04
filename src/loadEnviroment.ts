@@ -7,7 +7,7 @@ const environment = {
   mongoDbUrl: process.env.MONGODB_URL,
   jwtSecret: process.env.JWT_SECRET,
   supabaseKey: process.env.SUPABASE_KEY,
-  supabaseBucket: process.env,
+  supabaseBucket: process.env.SUPABASE_BUCKET_ID,
   supabaseUrl: process.env.SUPABASE_URL,
 };
 
