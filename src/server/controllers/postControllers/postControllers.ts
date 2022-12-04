@@ -90,11 +90,8 @@ export const createPost = async (
 
     res.status(201).json({ ...newPost.toJSON(), image: post.imagePaths });
   } catch (error: unknown) {
-    const customError = new CustomError(
-      (error as Error).message,
-      400,
-      "Error creating the post"
+    next(
+      new CustomError((error as Error).message, 400, "Error creating the post")
     );
-    next(customError);
   }
 };
