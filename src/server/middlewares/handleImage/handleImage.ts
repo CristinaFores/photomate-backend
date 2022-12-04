@@ -3,15 +3,19 @@ import path from "path";
 import sharp from "sharp";
 import CustomError from "../../../CustomError/CustomError.js";
 import type { CustomRequest } from "../../../types/types.js";
-import postsRoutes from "../../routers/routes/postRouters.js";
 
-const { imagesRoute } = postsRoutes;
+const imagesRoute = process.env.IMAGES_ROUTE || "assets/images";
 
 const handleImage = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
 ) => {
+  if (!req.file) {
+    next();
+    return;
+  }
+
   const { filename, originalname } = req.file;
 
   try {
@@ -31,8 +35,7 @@ const handleImage = async (
     next();
   } catch {
     const formatError = new CustomError(
-      "Error formating image",
-
+      "Error formatting image",
       400,
       "Sorry, your image is not valid"
     );

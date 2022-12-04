@@ -2,11 +2,10 @@ import type { NextFunction } from "express";
 import fs from "fs/promises";
 import CustomError from "../../../CustomError/CustomError";
 import type { CustomRequest } from "../../../types/types";
-import postRoutes from "../../routers/routes/postRouters";
 
 import handleImage from "./handleImage";
 
-const { imagesRoute } = postRoutes;
+const imagesRoute = process.env.IMAGES_ROUTE || "assets/images";
 
 const postlist = [
   {
@@ -65,8 +64,7 @@ describe("Given the handleImage middleware", () => {
       mockedFile = jest.fn().mockRejectedValue(new Error());
 
       const newError = new CustomError(
-        "Error formating image",
-
+        "Error formatting image",
         400,
         "Sorry, your image is not valid"
       );
@@ -74,6 +72,16 @@ describe("Given the handleImage middleware", () => {
       await handleImage(req as CustomRequest, null, next);
 
       expect(next).toBeCalledWith(newError);
+    });
+  });
+
+  describe("When it receives no file", () => {
+    test("Then it should skip the middleware and call next", async () => {
+      req.file = null;
+
+      await handleImage(req as CustomRequest, null, next);
+
+      expect(next).toHaveBeenCalled();
     });
   });
 });
