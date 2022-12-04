@@ -7,18 +7,23 @@ import {
   getPostById,
   getPosts,
 } from "../../controllers/postControllers/postControllers.js";
-import postsRoutes from "../routes/postsRouters.js";
+import handleImage from "../../middlewares/handleImage/handleImage.js";
+import imageBackupUpload from "../../middlewares/imagesBackupUpload/imagesBackupUpload.js";
+
+import postRoutes from "../routes/postRouters.js";
+
 const {
   postsRoute,
   createPostRoute,
   deletepostRoute,
-  imagesRoute,
+
   postIdRoute,
-} = postsRoutes;
+} = postRoutes;
 
 const postsRouter = express.Router();
+
 const upload = multer({
-  dest: path.join(imagesRoute),
+  dest: path.join("assets", "images"),
   limits: {
     fileSize: 5000000,
   },
@@ -27,6 +32,14 @@ const upload = multer({
 postsRouter.get(postsRoute, getPosts);
 postsRouter.get(postIdRoute, getPostById);
 postsRouter.delete(deletepostRoute, deletePostById);
-postsRouter.post(createPostRoute, upload.single, createPost);
+
+postsRouter.post(
+  createPostRoute,
+
+  upload.single("image"),
+  handleImage,
+  imageBackupUpload,
+  createPost
+);
 
 export default postsRouter;

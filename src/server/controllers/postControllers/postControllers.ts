@@ -33,7 +33,6 @@ export const getPostById = async (
 
   try {
     const posts = await Post.findById(id);
-
     if (!posts) {
       next(new CustomError("Post not found", 404, "Post not found"));
       return;
@@ -75,29 +74,28 @@ export const createPost = async (
   next: NextFunction
 ) => {
   const { userId } = req;
-  const { title, buckpicture, imagePaths, owner, description } =
+  const { title, description, imagePaths, buckpicture } =
     req.body as PostStructure;
+
+  console.log(imagePaths);
 
   try {
     const post = {
-      createdBy: userId,
       title,
       description,
       buckpicture,
       imagePaths,
-      owner,
+      owner: userId,
     };
 
-    const newPost = await (await Post.create(post)).populate("owner");
+    const newPost = await Post.create(post);
 
-    res.status(200).json(newPost);
-
-    res.status(201).json({ text: "Character created!" });
+    res.status(201).json({ ...newPost.toJSON(), image: post.imagePaths });
   } catch (error: unknown) {
     const customError = new CustomError(
       (error as Error).message,
       400,
-      "Error creating the prediction"
+      "Error creating the post"
     );
     next(customError);
   }
