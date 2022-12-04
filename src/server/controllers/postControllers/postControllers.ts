@@ -77,8 +77,6 @@ export const createPost = async (
   const { title, description, imagePaths, buckpicture } =
     req.body as PostStructure;
 
-  console.log(imagePaths);
-
   try {
     const post = {
       title,
