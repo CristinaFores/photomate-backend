@@ -4,34 +4,32 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import request from "supertest";
 import jwt from "jsonwebtoken";
+import path from "path";
 import app from "../../app";
 import { connectDb } from "../../../database";
 import Post from "../../../database/models/Post";
-import type { Credentials } from "../../../types/types";
 
 let server: MongoMemoryServer;
 
-const userId = "6384fe9a96794a4b19432655";
-const user: Credentials = {
-  username: "Cristina",
-  password: "123456789",
-};
-
 const requestUserToken = jwt.sign(
-  { user: user.username, id: userId },
-
+  { user: "Cristina", id: "6384fe9a96794a4b19432655" },
+  environment.jwtSecret
+);
+const requestUser2Token = jwt.sign(
+  { user: "Cristina2", id: "6384fe9a96794a4b19432656" },
   environment.jwtSecret
 );
 
-const postlist = [
+const postId = "6384fe9a96794a4b19432654";
+const postList = [
   {
     title: "12345678",
     description: "esto es mi primer post",
     imagePaths: [""],
     buckpicture: [""],
     tags: [""],
-    _id: userId,
-    owner: userId,
+    _id: postId,
+    owner: "6384fe9a96794a4b19432655",
   },
 ];
 
@@ -49,96 +47,109 @@ afterEach(async () => {
   await Post.deleteMany();
 });
 
-describe("Given a POST/ posts enpoint", () => {
-  beforeEach(async () => {
-    await Post.create(postlist);
-  });
+describe("Given a POST /posts endpoint", () => {
+  describe("When I send a valid request body", () => {
+    test("Then the post is created", async () => {
+      const expectedStatus = 201;
 
-  describe("When it receives a request with list the posts", () => {
-    test("Then it should respond with a 200 status and a list post", async () => {
-      const expectedStatus = 200;
-
-      const response = await request(app)
-        .get("/posts")
+      const post = {
+        title: "12345678",
+        description: "esto es mi primer post",
+      };
+      const createdPost = await request(app)
+        .post("/posts")
+        .field("title", post.title)
+        .field("description", post.description)
+        .attach("image", path.join(__dirname, "testImage.jpeg"))
         .set("Authorization", `Bearer ${requestUserToken}`)
         .set("Content-Type", "application/json")
         .expect(expectedStatus);
 
-      expect(response.body).toHaveProperty("posts");
+      expect(createdPost.body).toMatchObject(post);
     });
   });
 });
 
-describe("Given a POST/ posts/:id enpoint", () => {
+describe("Given a GET /posts/:id endpoint", () => {
   beforeEach(async () => {
-    await Post.create(postlist);
+    await Post.create(postList);
   });
-  describe("When it receives a request with one post by id user  ", () => {
-    test("Then it should respond with a 200 status and post list", async () => {
-      const expectedStatus = 200;
-      await request(app)
-        .get(`/posts/${userId}`)
+  describe("When I request a valid post id", () => {
+    test("Then it returns the requested post", async () => {
+      const post = await request(app)
+        .get(`/posts/${postId}`)
         .set("Authorization", `Bearer ${requestUserToken}`)
         .set("Content-Type", "application/json")
-        .expect(expectedStatus);
+        .expect(200);
+
+      expect(post.body).toMatchObject({
+        title: postList[0].title,
+        description: postList[0].description,
+      });
     });
   });
-  describe("When it receives a request with one post by id user  ", () => {
+  describe("When I request a non existent post id ", () => {
     test("Then it should respond with a 404 status", async () => {
-      const expectedStatus = 404;
-
       await request(app)
         .get(`/posts/6384fe9a96794a4b19432651`)
         .set("Authorization", `Bearer ${requestUserToken}`)
         .set("Content-Type", "application/json")
-        .expect(expectedStatus);
+        .expect(404);
     });
   });
 
-  describe("Given a POST/ posts/:id enpoint", () => {
-    describe("When it receives a request with one post by id user  ", () => {
-      test("Then it should respond with a 401 status and post destil", async () => {
-        const expectedStatus = 401;
-        const [{ _id }] = postlist;
-        await request(app)
-          .get(`/posts/${_id}`)
-          .set("Authorization", `Bearer ${""}`)
-          .set("Content-Type", "application/json")
-          .expect(expectedStatus);
-      });
+  describe("When I request an invalid id", () => {
+    test("Then it should respond with a 400 status", async () => {
+      await request(app)
+        .get(`/posts/1234`)
+        .set("Authorization", `Bearer ${requestUserToken}`)
+        .set("Content-Type", "application/json")
+        .expect(400);
+    });
+  });
+});
+
+describe("Given a GET /posts endpoint", () => {
+  beforeEach(async () => {
+    await Post.create(postList);
+  });
+  describe("When I request all posts", () => {
+    test("Then it returns all posts", async () => {
+      await request(app)
+        .get(`/posts`)
+        .set("Authorization", `Bearer ${requestUserToken}`)
+        .set("Content-Type", "application/json")
+        .expect(200);
     });
   });
 });
 
 describe("Given a DELETE /:id endpoint", () => {
-  describe("When it receives a request with one post by id and it existe", () => {
-    test("Then it should respond with status 200 ", async () => {
-      const postlist = [
-        {
-          title: "new post",
-          description: "description",
-          imagePaths: ["../../../img/algo-salio-mal.png"],
-          buckpicture: ["../../../img/algo-salio-mal.png"],
-          date: "2022-12-01T15:10:24.551Z",
-          _id: userId,
-          owner: userId,
-        },
-      ];
-      const [{ _id }] = postlist;
-      await Post.create(postlist);
-
+  beforeEach(async () => {
+    await Post.create(postList);
+  });
+  describe("When I request do delete a valid id", () => {
+    test("Then it should delete it", async () => {
       const response = await request(app)
-        .delete(`/posts/${_id}`)
+        .delete(`/posts/${postId}`)
         .set("Authorization", `Bearer ${requestUserToken}`)
-        .send({ id: "6388c3e008d4c054bd2e59eb" })
         .expect(200);
 
       expect(response.body);
     });
   });
 
+  describe("When a user deletes a post that is not his", () => {
+    test("Then it should respond with a 401 status", async () => {
+      await request(app)
+        .delete(`/posts/${postId}`)
+        .set("Authorization", `Bearer ${requestUser2Token}`)
+        .expect(403);
+    });
+  });
+
   describe("When it receives an authorized request with an invalid id", () => {
-    test("Then it should respond with status 403 '", async () => {
+    test("Then it should respond with status 400", async () => {
       const response = await request(app)
         .delete(`/posts/12345`)
         .set("Authorization", `Bearer ${requestUserToken}`)
