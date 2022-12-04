@@ -5,10 +5,9 @@ import fs from "fs/promises";
 import environment from "../../../loadEnviroment.js";
 import type { CustomRequest } from "../../../types/types.js";
 import CustomError from "../../../CustomError/CustomError.js";
-import postRoutes from "../../routers/routes/postRouters.js";
 
 const { supabaseUrl, supabaseKey, supabaseBucket } = environment;
-const { imagesRoute } = postRoutes;
+const imagesRoute = process.env.IMAGES_ROUTE || "assets/images";
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -19,6 +18,11 @@ const imageBackupUpload = async (
   res: Response,
   next: NextFunction
 ) => {
+  if (!req.file) {
+    next();
+    return;
+  }
+
   try {
     const imagePath = path.join(imagesRoute, req.file.originalname);
     await fs.rename(path.join(imagesRoute, req.file.filename), imagePath);
