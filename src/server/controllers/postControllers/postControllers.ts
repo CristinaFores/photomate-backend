@@ -68,6 +68,40 @@ export const deletePostById = async (
   }
 };
 
+export const updatePost = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const { userId } = req;
+  const { title, description, imagePaths, buckpicture } =
+    req.body as PostStructure;
+
+  try {
+    const post = await Post.findOne({ _id: req.params.id });
+
+    if (post.owner.toString() !== userId) {
+      next(new CustomError("Not allowed", 403, " Update not allowed"));
+      return;
+    }
+
+    const updatedPost = await Post.findByIdAndUpdate(
+      req.params.id,
+      {
+        title,
+        description,
+        imagePaths,
+        buckpicture,
+      },
+      { new: true }
+    );
+
+    res.status(200).json({ ...updatedPost.toJSON(), image: post.imagePaths });
+  } catch (error: unknown) {
+    next(new CustomError((error as Error).message, 400, "Error updating post"));
+  }
+};
+
 export const createPost = async (
   req: CustomRequest,
   res: Response,

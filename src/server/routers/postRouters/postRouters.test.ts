@@ -33,6 +33,21 @@ const postList = [
   },
 ];
 
+jest.mock("@supabase/supabase-js", () => ({
+  createClient: () => ({
+    storage: {
+      from: () => ({
+        upload: jest.fn().mockResolvedValue({ error: null }),
+        getPublicUrl: () => ({
+          data: {
+            publicUrl: "testFileImage.webptestOriginalImage.webp",
+          },
+        }),
+      }),
+    },
+  }),
+}));
+
 beforeAll(async () => {
   server = await MongoMemoryServer.create();
   await connectDb(server.getUri());
@@ -120,6 +135,46 @@ describe("Given a GET /posts endpoint", () => {
         .set("Authorization", `Bearer ${requestUserToken}`)
         .set("Content-Type", "application/json")
         .expect(200);
+    });
+  });
+});
+
+describe("Given a PATCH /posts/:id endpoint", () => {
+  beforeEach(async () => {
+    await Post.create(postList);
+  });
+  describe("When I request to update a valid id", () => {
+    test("Then it returns the updated post", async () => {
+      const post = await request(app)
+        .patch(`/posts/${postId}`)
+        .field("title", "12345678")
+        .set("Authorization", `Bearer ${requestUserToken}`)
+        .set("Content-Type", "application/json")
+        .expect(200);
+
+      expect(post.body).toMatchObject({
+        title: "12345678",
+      });
+    });
+  });
+  describe("When a user tries to update a post that is not his", () => {
+    test("Then it should respond with a 403 status", async () => {
+      await request(app)
+        .patch(`/posts/${postId}`)
+        .field("title", "12345678")
+        .set("Authorization", `Bearer ${requestUser2Token}`)
+        .set("Content-Type", "application/json")
+        .expect(403);
+    });
+  });
+  describe("When I request to update an invalid id", () => {
+    test("Then it should respond with a 400 status", async () => {
+      await request(app)
+        .patch(`/posts/1234`)
+        .field("title", "12345678")
+        .set("Authorization", `Bearer ${requestUserToken}`)
+        .set("Content-Type", "application/json")
+        .expect(400);
     });
   });
 });
