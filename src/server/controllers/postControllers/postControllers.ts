@@ -10,9 +10,21 @@ export const getPosts = async (
   next: NextFunction
 ) => {
   try {
-    const posts = await Post.find({}).populate("owner");
+    const { skip = 0, limit = 10, title = "" } = req.query || {};
+    const filter = title ? { title: { $regex: title, $options: "i" } } : {};
 
-    res.status(200).json({ posts });
+    const posts = await Post.find(filter)
+      .sort({ _id: -1 })
+      .skip(Number(skip))
+      .limit(Number(limit))
+      .populate("owner");
+
+    const total = await Post.count(filter);
+
+    res.status(200).json({
+      posts,
+      pagination: { skip: Number(skip), limit: Number(limit), total },
+    });
   } catch (error: unknown) {
     next(
       new CustomError(
@@ -32,7 +44,7 @@ export const getPostById = async (
   const { id } = req.params;
 
   try {
-    const posts = await Post.findById(id);
+    const posts = await Post.findById(id).populate("owner");
     if (!posts) {
       next(new CustomError("Post not found", 404, "Post not found"));
       return;
