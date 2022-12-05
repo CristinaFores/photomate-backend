@@ -25,7 +25,7 @@ const handleImage = async (
     )}`;
 
     await sharp(path.join(imagesRoute, filename))
-      .resize(200, 200, { fit: "cover", position: "top" })
+      .resize(500, 500, { fit: "cover", position: "top" })
       .webp({ quality: 92 })
       .toFormat("webp")
       .toFile(path.join(imagesRoute, `${imagePath}.webp`));
