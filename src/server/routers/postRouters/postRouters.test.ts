@@ -131,7 +131,7 @@ describe("Given a GET /posts endpoint", () => {
   describe("When I request all posts", () => {
     test("Then it returns all posts", async () => {
       await request(app)
-        .get(`/posts`)
+        .get(`/posts?title=12345678`)
         .set("Authorization", `Bearer ${requestUserToken}`)
         .set("Content-Type", "application/json")
         .expect(200);

@@ -37,25 +37,39 @@ beforeEach(() => {
 });
 
 jest.mock("sharp", () => () => ({
+  toFile: jest.fn(),
   resize: jest.fn().mockReturnValue({
     webp: jest.fn().mockReturnValue({
       toFormat: jest.fn().mockReturnValue({
-        toFile: mockedFile,
+        toBuffer: mockedFile,
       }),
     }),
+  }),
+}));
+
+jest.mock("@supabase/supabase-js", () => ({
+  createClient: () => ({
+    storage: {
+      from: () => ({
+        upload: jest.fn().mockResolvedValue({ error: null }),
+        bucket: () => ({
+          getPublicUrl: () => ({
+            publicUrl: "testFileImage.webptestOriginalImage.webp",
+          }),
+        }),
+      }),
+    },
   }),
 }));
 
 describe("Given the handleImage middleware", () => {
   describe("When it receives a request with a correct file", () => {
     test("Then it should resize the image and call next", async () => {
-      const expectedFile = "postImageOriginal.webp";
       req.file = file as Express.Multer.File;
 
       await handleImage(req as CustomRequest, null, next);
 
       expect(next).toHaveBeenCalled();
-      expect(req.file.filename).toBe(expectedFile);
     });
   });
 

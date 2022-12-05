@@ -24,6 +24,7 @@ jobs:
           SUPABASE_URL: ${{secrets.SUPABASE_URL}}
           SUPABASE_KEY: ${{secrets.SUPABASE_KEY}}
           SUPABASE_BUCKET_ID: ${{secrets.SUPABASE_BUCKET_ID}}
+          IMAGES_PATH: ${{secrets.IMAGES_PATH}}
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:

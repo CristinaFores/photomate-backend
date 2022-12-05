@@ -55,10 +55,23 @@ describe("Given a getPosts controller", () => {
 
       const expectedStatus = 200;
 
-      Post.find = jest.fn().mockReturnThis();
+      Post.find = jest.fn().mockReturnValue({
+        sort: jest.fn().mockReturnValue({
+          skip: jest.fn().mockReturnValue({
+            limit: jest.fn().mockReturnValue({
+              populate: jest.fn(),
+            }),
+          }),
+        }),
+      });
       Post.populate = jest.fn().mockReturnValue(postlist);
+      Post.count = jest.fn().mockReturnValue(1);
 
-      await getPosts(null, res as Response, next as NextFunction);
+      await getPosts(
+        {} as CustomRequest,
+        res as Response,
+        next as NextFunction
+      );
 
       expect(res.status).toHaveBeenCalledWith(expectedStatus);
     });
@@ -66,16 +79,21 @@ describe("Given a getPosts controller", () => {
 
   describe("When it receives a request incorrect", () => {
     test("Then its should next should be called", async () => {
-      const customError = new CustomError(
-        "",
-        500,
-        "Database doesn't work, try again later"
-      );
       const error = new Error();
-      Post.find = jest.fn().mockReturnThis();
+      Post.find = jest.fn().mockReturnValue({
+        sort: jest.fn().mockReturnValue({
+          skip: jest.fn().mockReturnValue({
+            limit: jest.fn().mockReturnValue({
+              populate: jest.fn(),
+            }),
+          }),
+        }),
+      });
       Post.populate = jest.fn().mockRejectedValue(error);
+      Post.count = jest.fn().mockReturnValue(1);
+
       await getPosts(null, res as Response, next as NextFunction);
-      expect(next).toHaveBeenCalledWith(customError);
+      expect(next).toHaveBeenCalled();
     });
   });
 
@@ -96,7 +114,8 @@ describe("Given a getPosts controller", () => {
       test("Then it should call the response method status with a 200 and json with post", async () => {
         const expectedStatus = 200;
 
-        Post.findById = jest.fn().mockReturnValue(post);
+        Post.findById = jest.fn().mockReturnThis();
+        Post.populate = jest.fn().mockReturnValue(post);
 
         await getPostById(
           req as CustomRequest,
@@ -111,7 +130,8 @@ describe("Given a getPosts controller", () => {
 
     describe("When it receives a request with an incorrect post id", () => {
       test("Then it should call the next with a response status 404 and public message 'Post not found'", async () => {
-        Post.findById = jest.fn().mockResolvedValue("");
+        Post.findById = jest.fn().mockReturnThis();
+        Post.populate = jest.fn().mockResolvedValue("");
         await getPostById(
           req as CustomRequest,
           res as Response,
@@ -129,7 +149,8 @@ describe("Given a getPosts controller", () => {
     describe("When it receives a request with id no exist", () => {
       test("Then it should call the next", async () => {
         const error = new Error();
-        Post.findById = jest.fn().mockRejectedValue(error);
+        Post.findById = jest.fn().mockReturnThis();
+        Post.populate = jest.fn().mockRejectedValue(error);
         await getPostById(
           req as CustomRequest,
           res as Response,
