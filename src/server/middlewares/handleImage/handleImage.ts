@@ -31,7 +31,7 @@ const handleImage = async (
 
     const fileName = `${crypto.randomBytes(16).toString("hex")}.webp`;
 
-    await bucket.upload(fileName, file);
+    await bucket.upload(fileName, file, { cacheControl: "31536000" });
     const {
       data: { publicUrl },
     } = bucket.getPublicUrl(fileName);
