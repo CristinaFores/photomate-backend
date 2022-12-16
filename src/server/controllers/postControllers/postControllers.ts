@@ -15,15 +15,15 @@ export const getPosts = async (
 
     const posts = await Post.find(filter)
       .sort({ _id: -1 })
-      .skip(Number(skip))
-      .limit(Number(limit))
+      .skip(+skip)
+      .limit(+limit)
       .populate("owner");
 
     const total = await Post.count(filter);
 
     res.status(200).json({
       posts,
-      pagination: { skip: Number(skip), limit: Number(limit), total },
+      pagination: { skip: +skip, limit: +limit, total },
     });
   } catch (error: unknown) {
     next(
