@@ -3,16 +3,15 @@
 # CRUD BACK
 
 ## Produccion
+💫[Back deploy on Render](https://https-cristina-fores-final-project.onrender.com)
 
-💫[Back deploy on Render](https://cristina-fores-final-project-202209.onrender.com/)
-
-💫[Photomate app](https://cristina-fores-final-project-202209.netlify.app/)
+💫[Photomate app](https://photomate-cristina.netlify.app/)
 
 ## Repository
 
-💫[Repository Frontend](https://github.com/isdi-coders-2022/Cristina-Fores_Front-Final-Project-202209-BCN)
+💫[Repository Frontend](https://github.com/CristinaFores/photomate-fronted)
 
-💫[Repository Backend](https://github.com/isdi-coders-2022/Cristina-Fores_Back-Final-Project-202209-BCN)
+💫[Repository Backend](https://github.com/CristinaFores/photomate-backend)
 
 ## Sonar
 
